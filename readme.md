@@ -10,7 +10,7 @@ ROS2 (C++) workspace for Exam Proctoring Bot:
 ## Quickstart
 
 ```bash
-git clone https://github.com/YOUR_USER/exam_bot_ws.git
+git clone https://github.com/KiranGunathilaka/autonomous_exam_proctoring_robot
 cd exam_bot_ws
 rosdep update
 rosdep install --from-paths src --ignore-src -r -y
