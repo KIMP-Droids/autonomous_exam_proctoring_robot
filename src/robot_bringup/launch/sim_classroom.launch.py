@@ -65,7 +65,6 @@ def generate_launch_description():
     )
 
 
-    # Bridge for /clock (Gazebo -> ROS 2) - ESSENTIAL for use_sim_time
     clock_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -76,8 +75,7 @@ def generate_launch_description():
         output='screen'
     )
 
-    # Bridge for cmd_vel (ROS 2 -> Gazebo)
-    # Format: /ros_topic@ros_msg_type@gz.msgs.GzType
+
     cmd_vel_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -91,10 +89,6 @@ def generate_launch_description():
         output='screen'
     )
 
-    # Bridge for odom (Gazebo -> ROS 2)
-    # DiffDrive plugin may publish to model-specific topic: /model/AEP_Robot/odom
-    # Bridge it to ROS /odom topic
-    # If plugin publishes to global /odom, change to: '/odom@nav_msgs/msg/Odometry@gz.msgs.Odometry'
     odom_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -108,8 +102,6 @@ def generate_launch_description():
         output='screen'
     )
 
-    # Bridge for scan (Gazebo -> ROS 2)
-    # Note: Gazebo LiDAR may publish to different topic, adjust if needed
     scan_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',

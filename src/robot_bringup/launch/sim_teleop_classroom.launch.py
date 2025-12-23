@@ -47,13 +47,6 @@ def generate_launch_description():
         }]
     )
 
-    static_tf_node = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='tf_basefootprint_baselink',
-        arguments=['0','0','0','0','0','0','base_footprint','base_link']
-    )
-
     # Ensure Gazebo can resolve package://robot_description/...
     gz_resource_path = os.path.join(desc_share, '..')
     os.environ['GZ_SIM_RESOURCE_PATH'] = (
@@ -76,15 +69,6 @@ def generate_launch_description():
         executable='parameter_bridge',
         name='clock_bridge',
         arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
-        output='screen'
-    )
-
-    tf_bridge = Node(
-        package='ros_gz_bridge',
-        executable='parameter_bridge',
-        name='tf_bridge',
-        arguments=['/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V'],
-        parameters=[{'use_sim_time': use_sim_time}],
         output='screen'
     )
 
@@ -124,6 +108,14 @@ def generate_launch_description():
         output='screen'
     )
 
+    odom_to_base_footprint_tf_node = Node(
+        package='robot_bringup',
+        executable='odom_to_base_footprint_tf.py',
+        name='odom_to_base_footprint_tf',
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time}],
+    )
+
     spawn_robot_node = Node(
         package='ros_gz_sim',
         executable='create',
@@ -161,14 +153,13 @@ def generate_launch_description():
         gz_server,
 
         robot_state_publisher_node,
-        static_tf_node,       
 
         clock_bridge,
-        tf_bridge,
         odom_bridge,
         scan_bridge,
         joint_state_bridge,
         cmd_vel_bridge,
+        odom_to_base_footprint_tf_node,
 
         spawn_delayed,
         rviz_node,

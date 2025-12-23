@@ -16,6 +16,8 @@
         <joint_name>${prefix}back_castor_wheel_joint</joint_name>
       </plugin>
     </gazebo>
+    <!-- base_footprint (root, no inertial) -->
+    <link name="${prefix}base_footprint" />
     <!-- base_link -->
     <link name="${prefix}base_link">
       <inertial>
@@ -39,6 +41,11 @@
         </geometry>
       </collision>
     </link>
+    <joint name="${prefix}base_footprint_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="${prefix}base_footprint" />
+      <child link="${prefix}base_link" />
+    </joint>
     <!-- Gazebo diff-drive plugin (MODEL SCOPE) -->
     <gazebo>
       <plugin name="gz::sim::systems::DiffDrive" filename="gz-sim8-diff-drive-system">
@@ -49,11 +56,8 @@
         <odom_publish_frequency>50</odom_publish_frequency>
         <!-- cmd vel in Gazebo -->
         <topic>/cmd_vel</topic>
-        <!-- Odometry + TF output in Gazebo -->
+        <!-- Odometry output in Gazebo (TF disabled; use ROS TF only) -->
         <odom_topic>/odom</odom_topic>
-        <tf_topic>/tf</tf_topic>
-        <frame_id>odom</frame_id>
-        <child_frame_id>base_link</child_frame_id>
       </plugin>
     </gazebo>
     <!-- lidar -->
@@ -145,72 +149,6 @@
       <parent link="${prefix}base_link" />
       <child link="${prefix}imu_link" />
     </joint>
-    <!-- Gazebo IMU sensor plugin -->
-    <!-- NOTE: IMU plugin temporarily commented out due to plugin loading issues -->
-    <!-- The imu_link still exists in URDF for future use -->
-    <!-- To enable IMU, uncomment below and ensure correct plugin is installed -->
-    <!--
-    <gazebo reference="${prefix}imu_link">
-      <sensor name="imu_sensor" type="imu">
-        <always_on>true</always_on>
-        <update_rate>100</update_rate>
-        <imu>
-          <angular_velocity>
-            <x>
-              <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.0002</stddev>
-                <bias_mean>0.0</bias_mean>
-                <bias_stddev>0.0</bias_stddev>
-              </noise>
-            </x>
-            <y>
-              <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.0002</stddev>
-                <bias_mean>0.0</bias_mean>
-                <bias_stddev>0.0</bias_stddev>
-              </noise>
-            </y>
-            <z>
-              <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.0002</stddev>
-                <bias_mean>0.0</bias_mean>
-                <bias_stddev>0.0</bias_stddev>
-              </noise>
-            </z>
-          </angular_velocity>
-          <linear_acceleration>
-            <x>
-              <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.017</stddev>
-                <bias_mean>0.0</bias_mean>
-                <bias_stddev>0.0</bias_stddev>
-              </noise>
-            </x>
-            <y>
-              <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.017</stddev>
-                <bias_mean>0.0</bias_mean>
-                <bias_stddev>0.0</bias_stddev>
-              </noise>
-            </y>
-            <z>
-              <noise type="gaussian">
-                <mean>0.0</mean>
-                <stddev>0.017</stddev>
-                <bias_mean>0.0</bias_mean>
-                <bias_stddev>0.0</bias_stddev>
-              </noise>
-            </z>
-          </linear_acceleration>
-        </imu>
-      </sensor>
-    </gazebo>
-    -->
     <!-- left wheel -->
     <link name="${prefix}left_wheel_link">
       <inertial>
