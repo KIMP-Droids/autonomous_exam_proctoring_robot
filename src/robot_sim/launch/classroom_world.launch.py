@@ -29,7 +29,8 @@ def generate_launch_description():
     # URDF xacro path
     urdf_xacro_path = os.path.join(desc_share, 'urdf', 'main.urdf.xacro')
     
-    # Controller YAML path (for ros2_control plugin)
+    # Controller YAML path (not used in simulation - kept for reference only)
+    # Simulation uses Gazebo DiffDrive plugin, not ros2_control
     controller_yaml_path = os.path.join(desc_share, 'config', 'controllers.yaml')
 
     # Process URDF from xacro and replace placeholder with actual path at runtime

@@ -1,9 +1,21 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-
-
   <xacro:macro name="AEP_Robot" params="prefix:=">
-
+    <!-- Gazebo joint state publisher (MODEL SCOPE) -->
+    <gazebo>
+      <plugin filename="gz-sim8-joint-state-publisher-system"
+          name="gz::sim::systems::JointStatePublisher">
+        <!-- Use a clear gazebo topic name -->
+        <topic>/joint_states</topic>
+        <!-- Publish only the joints you want -->
+        <joint_name>${prefix}left_wheel_joint</joint_name>
+        <joint_name>${prefix}right_wheel_joint</joint_name>
+        <joint_name>${prefix}front_castor_body_joint</joint_name>
+        <joint_name>${prefix}front_castor_wheel_joint</joint_name>
+        <joint_name>${prefix}back_castor_body_joint</joint_name>
+        <joint_name>${prefix}back_castor_wheel_joint</joint_name>
+      </plugin>
+    </gazebo>
     <!-- base_link -->
     <link name="${prefix}base_link">
       <inertial>
@@ -27,22 +39,23 @@
         </geometry>
       </collision>
     </link>
-    
-    <!-- Gazebo diff-drive plugin -->
-    <gazebo reference="${prefix}base_link">
-      <plugin name="gz::plugin::DiffDrive" filename="gz-sim-diff-drive-system">
+    <!-- Gazebo diff-drive plugin (MODEL SCOPE) -->
+    <gazebo>
+      <plugin name="gz::sim::systems::DiffDrive" filename="gz-sim8-diff-drive-system">
         <left_joint>${prefix}left_wheel_joint</left_joint>
         <right_joint>${prefix}right_wheel_joint</right_joint>
         <wheel_separation>0.5897</wheel_separation>
         <wheel_radius>0.1</wheel_radius>
-        <odom_publish_rate>50</odom_publish_rate>
-        <topic>cmd_vel</topic>
-        <odom_topic>odom</odom_topic>
-        <odom_frame>odom</odom_frame>
-        <robot_base_frame>${prefix}base_link</robot_base_frame>
+        <odom_publish_frequency>50</odom_publish_frequency>
+        <!-- cmd vel in Gazebo -->
+        <topic>/cmd_vel</topic>
+        <!-- Odometry + TF output in Gazebo -->
+        <odom_topic>/odom</odom_topic>
+        <tf_topic>/tf</tf_topic>
+        <frame_id>odom</frame_id>
+        <child_frame_id>base_link</child_frame_id>
       </plugin>
     </gazebo>
-
     <!-- lidar -->
     <link name="${prefix}lidar_link">
       <inertial>
@@ -65,7 +78,6 @@
           <mesh filename="package://robot_description/meshes/lidar_link.STL" />
         </geometry>
       </collision>
-      
       <!-- Gazebo LiDAR sensor plugin -->
       <gazebo reference="${prefix}lidar_link">
         <sensor name="lidar" type="ray">
@@ -99,14 +111,12 @@
         </sensor>
       </gazebo>
     </link>
-
     <joint name="${prefix}lidar_joint" type="fixed">
       <origin xyz="0 0.000420393431200835 0.32565" rpy="0 0 0" />
       <parent link="${prefix}base_link" />
       <child link="${prefix}lidar_link" />
       <axis xyz="0 0 0" />
     </joint>
-
     <!-- IMU link -->
     <link name="${prefix}imu_link">
       <inertial>
@@ -130,13 +140,11 @@
         </geometry>
       </collision>
     </link>
-
     <joint name="${prefix}imu_joint" type="fixed">
       <origin xyz="0 0 0.15" rpy="0 0 0" />
       <parent link="${prefix}base_link" />
       <child link="${prefix}imu_link" />
     </joint>
-
     <!-- Gazebo IMU sensor plugin -->
     <!-- NOTE: IMU plugin temporarily commented out due to plugin loading issues -->
     <!-- The imu_link still exists in URDF for future use -->
@@ -203,7 +211,6 @@
       </sensor>
     </gazebo>
     -->
-
     <!-- left wheel -->
     <link name="${prefix}left_wheel_link">
       <inertial>
@@ -227,14 +234,12 @@
         </geometry>
       </collision>
     </link>
-
     <joint name="${prefix}left_wheel_joint" type="continuous">
       <origin xyz="0 0.29485 -0.025" rpy="0 0 0" />
       <parent link="${prefix}base_link" />
       <child link="${prefix}left_wheel_link" />
       <axis xyz="0 1 0" />
     </joint>
-
     <!-- right wheel -->
     <link name="${prefix}right_wheel_link">
       <inertial>
@@ -258,14 +263,12 @@
         </geometry>
       </collision>
     </link>
-
     <joint name="${prefix}right_wheel_joint" type="continuous">
       <origin xyz="0 -0.29485 -0.025" rpy="0 0 0" />
       <parent link="${prefix}base_link" />
       <child link="${prefix}right_wheel_link" />
       <axis xyz="0 1 0" />
     </joint>
-
     <!-- front caster -->
     <link name="${prefix}front_castor_body_link">
       <inertial>
@@ -289,14 +292,12 @@
         </geometry>
       </collision>
     </link>
-
     <joint name="${prefix}front_castor_body_joint" type="continuous">
       <origin xyz="0.105 0 -0.0415" rpy="0 0 0" />
       <parent link="${prefix}base_link" />
       <child link="${prefix}front_castor_body_link" />
       <axis xyz="0 0 1" />
     </joint>
-
     <link name="${prefix}front_castor_wheel_link">
       <inertial>
         <origin xyz="0.001327 -0.02196 3.518E-06" rpy="0 0 0" />
@@ -319,14 +320,12 @@
         </geometry>
       </collision>
     </link>
-
     <joint name="${prefix}front_castor_wheel_joint" type="continuous">
       <origin xyz="0.021643 0.023336 -0.033" rpy="0 0 0" />
       <parent link="${prefix}front_castor_body_link" />
       <child link="${prefix}front_castor_wheel_link" />
       <axis xyz="0 1 0" />
     </joint>
-
     <!-- back caster -->
     <link name="${prefix}back_castor_body_link">
       <inertial>
@@ -350,14 +349,12 @@
         </geometry>
       </collision>
     </link>
-
     <joint name="${prefix}back_castor_body_joint" type="continuous">
       <origin xyz="-0.105 0 -0.0415" rpy="0 0 0" />
       <parent link="${prefix}base_link" />
       <child link="${prefix}back_castor_body_link" />
       <axis xyz="0 0 1" />
     </joint>
-
     <link name="${prefix}back_castor_wheel_link">
       <inertial>
         <origin xyz="0.001265 -0.021964 -2.6984E-06" rpy="0 0 0" />
@@ -380,71 +377,11 @@
         </geometry>
       </collision>
     </link>
-
     <joint name="${prefix}back_castor_wheel_joint" type="continuous">
       <origin xyz="-0.024216 0.020654 -0.033" rpy="0 0 0" />
       <parent link="${prefix}back_castor_body_link" />
       <child link="${prefix}back_castor_wheel_link" />
       <axis xyz="0 1 0" />
     </joint>
-
-    <!-- Gazebo ROS 2 control plugin -->
-    <gazebo>
-      <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-        <parameters>/home/kiran_gunathilaka/development/ros/exam_bot_ws/src/robot_description/config/controllers.yaml</parameters>
-        <controller_manager_name>controller_manager</controller_manager_name>
-      </plugin>
-    </gazebo>
-
-    <!-- ros2_control hardware description -->
-    <!-- Provides joint state interfaces for all joints (wheels + casters) -->
-    <ros2_control name="GazeboSimSystem" type="system">
-      <hardware>
-        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
-      </hardware>
-      
-      <!-- Left wheel joint - state only (diff-drive plugin controls it) -->
-      <joint name="${prefix}left_wheel_joint">
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-        <state_interface name="effort"/>
-      </joint>
-      
-      <!-- Right wheel joint - state only (diff-drive plugin controls it) -->
-      <joint name="${prefix}right_wheel_joint">
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-        <state_interface name="effort"/>
-      </joint>
-      
-      <!-- Front caster body joint - state only (passive) -->
-      <joint name="${prefix}front_castor_body_joint">
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-        <state_interface name="effort"/>
-      </joint>
-      
-      <!-- Front caster wheel joint - state only (passive) -->
-      <joint name="${prefix}front_castor_wheel_joint">
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-        <state_interface name="effort"/>
-      </joint>
-      
-      <!-- Back caster body joint - state only (passive) -->
-      <joint name="${prefix}back_castor_body_joint">
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-        <state_interface name="effort"/>
-      </joint>
-      
-      <!-- Back caster wheel joint - state only (passive) -->
-      <joint name="${prefix}back_castor_wheel_joint">
-        <state_interface name="position"/>
-        <state_interface name="velocity"/>
-        <state_interface name="effort"/>
-      </joint>
-    </ros2_control>
-
   </xacro:macro>
 </robot>

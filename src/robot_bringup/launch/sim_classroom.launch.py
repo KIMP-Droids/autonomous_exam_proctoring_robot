@@ -53,13 +53,25 @@ def generate_launch_description():
         }.items()
     )
 
+    joint_state_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='joint_state_bridge',
+        arguments=[
+            '/joint_states@sensor_msgs/msg/JointState@gz.msgs.Model'
+        ],
+        parameters=[{'use_sim_time': use_sim_time}],
+        output='screen'
+    )
+
+
     # Bridge for /clock (Gazebo -> ROS 2) - ESSENTIAL for use_sim_time
     clock_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
         name='clock_bridge',
         arguments=[
-            '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'
+            '/clock@rosgraph_msgs/msg/Clock@gz.msgs.Clock'
         ],
         output='screen'
     )
@@ -80,13 +92,15 @@ def generate_launch_description():
     )
 
     # Bridge for odom (Gazebo -> ROS 2)
-    # Note: Topic names may need adjustment based on Gazebo plugin output
+    # DiffDrive plugin may publish to model-specific topic: /model/AEP_Robot/odom
+    # Bridge it to ROS /odom topic
+    # If plugin publishes to global /odom, change to: '/odom@nav_msgs/msg/Odometry@gz.msgs.Odometry'
     odom_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
         name='odom_bridge',
         arguments=[
-            '/odom@nav_msgs/msg/Odometry@gz.msgs.Odometry'
+        '/odom@nav_msgs/msg/Odometry@gz.msgs.Odometry'
         ],
         parameters=[{
             'use_sim_time': use_sim_time
@@ -109,43 +123,6 @@ def generate_launch_description():
         output='screen'
     )
 
-    # Controller spawner - spawns joint_state_broadcaster from ros2_control
-    # This publishes joint states from Gazebo simulation
-    # NOTE: Don't pass -p params file - controller config is already loaded by gz_ros2_control plugin
-    # NOTE: Use full --controller-manager flag to match working example
-    joint_state_broadcaster_spawner = Node(
-        package='controller_manager',
-        executable='spawner',
-        arguments=[
-            'joint_state_broadcaster',
-            '--controller-manager', '/controller_manager'
-        ],
-        output='screen'
-    )
-    
-    # Spawn joint_state_broadcaster after robot spawns (delay to ensure controller_manager is ready)
-    # Using TimerAction with delay after sim_world_launch starts
-    load_joint_state_broadcaster = TimerAction(
-        period=8.0,  # Wait 8 seconds for robot spawn and controller_manager to be ready
-        actions=[joint_state_broadcaster_spawner]
-    )
-
-    # Bridge for imu (Gazebo -> ROS 2)
-    # NOTE: IMU bridge commented out as IMU sensor plugin is temporarily disabled
-    # Uncomment when IMU sensor is enabled in URDF
-    # imu_bridge = Node(
-    #     package='ros_gz_bridge',
-    #     executable='parameter_bridge',
-    #     name='imu_bridge',
-    #     arguments=[
-    #         '/imu@sensor_msgs/msg/Imu@gz.msgs.IMU'
-    #     ],
-    #     parameters=[{
-    #         'use_sim_time': use_sim_time
-    #     }],
-    #     output='screen'
-    # )
-
     # RViz config path
     rviz_config = os.path.join(bringup_share, 'config', 'rviz', 'sim.rviz')
 
@@ -162,16 +139,28 @@ def generate_launch_description():
         }]
     )
 
+    tf_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='tf_bridge',
+        arguments=[
+            '/tf@tf2_msgs/msg/TFMessage@gz.msgs.Pose_V'
+        ],
+        parameters=[{'use_sim_time': use_sim_time}],
+        output='screen'
+    )
+    
+
     return LaunchDescription([
         use_sim_time_arg,
         rviz_arg,
         sim_world_launch,
-        clock_bridge,  # MUST be first - provides /clock for use_sim_time
+        clock_bridge,  
+        tf_bridge,
         cmd_vel_bridge,
         odom_bridge,
         scan_bridge,
-        load_joint_state_broadcaster,  # Spawns joint_state_broadcaster from ros2_control
-        # imu_bridge,  # Commented out - IMU sensor temporarily disabled
+        joint_state_bridge,
         rviz_node,
     ])
 

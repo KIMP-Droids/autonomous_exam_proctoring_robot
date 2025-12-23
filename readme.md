@@ -180,7 +180,26 @@ ros2 topic echo /robot_description --once
 # Should show URDF XML
 ```
 
-### 5. Wheel Direction / Robot Moves Backwards
+### 5. Missing Joint States / TF Errors for Wheels/Casters
+
+**Symptoms:** RViz RobotModel shows "No transform from wheel links to base_link" or joint_states topic is empty
+
+**Fix:**
+- Verify joint state publisher plugin is loaded in URDF
+- Check joint_states bridge is running: `ros2 node list | grep joint_states_bridge`
+- Verify joint states topic exists: `ros2 topic echo /joint_states --once`
+- Check Gazebo joint state topic: `gz topic -l | grep joint`
+
+**Check:**
+```bash
+ros2 topic echo /joint_states --once
+ros2 topic hz /joint_states
+ros2 run tf2_ros tf2_echo base_link left_wheel_link
+```
+
+**Note:** Joint states come from Gazebo's joint state publisher plugin, not from ros2_control.
+
+### 6. Wheel Direction / Robot Moves Backwards
 
 **Symptoms:** Robot moves opposite to cmd_vel command
 
@@ -194,7 +213,7 @@ ros2 topic echo /robot_description --once
 - Right wheel: y = -0.29485 (negative)
 - Wheel separation = |left_y - right_y| = 0.5897 m
 
-### 6. Build Errors
+### 7. Build Errors
 
 **Symptoms:** `colcon build` fails
 
@@ -204,7 +223,7 @@ ros2 topic echo /robot_description --once
 - Verify CMakeLists.txt installs launch/config directories
 - Clean build: `rm -rf build install log` then rebuild
 
-### 7. Package Not Found Errors
+### 8. Package Not Found Errors
 
 **Symptoms:** `[ERROR] package 'robot_description' not found`
 
@@ -213,7 +232,7 @@ ros2 topic echo /robot_description --once
 - Rebuild: `colcon build --symlink-install`
 - Check package is built: `colcon list`
 
-### 8. RViz Config Not Found
+### 9. RViz Config Not Found
 
 **Symptoms:** `[ERROR] Could not load config file`
 
@@ -258,24 +277,49 @@ exam_bot_ws/
 
 ### Simulation Approach
 
-**Chosen:** Approach A - Gazebo diff-drive plugin + ros_gz_bridge
+**Approach A Only:** Gazebo DiffDrive Plugin + ros_gz_bridge
 
-- Uses Gazebo's built-in diff-drive system plugin
-- Bridges topics between ROS 2 and Gazebo using ros_gz_bridge
-- Simpler than ros2_control for demo purposes
-- Wheel parameters: separation=0.5897m, radius=0.1m (estimated)
+This workspace uses **ONLY** Gazebo's built-in DiffDrive system plugin (`gz-sim-diff-drive-system`) for robot locomotion in simulation. **ros2_control and gz_ros2_control are NOT used** in the simulation setup.
+
+**Key Components:**
+- **DiffDrive Plugin:** `gz-sim-diff-drive-system` plugin on `base_link` handles wheel motion and odometry
+- **Joint State Publisher:** `gz-sim-joint-state-publisher-system` plugin publishes joint states for TF tree
+- **Topic Bridges:** `ros_gz_bridge` bridges topics between Gazebo and ROS 2:
+  - `/cmd_vel` (ROS → Gazebo): Robot velocity commands
+  - `/odom` (Gazebo → ROS): Odometry from DiffDrive plugin
+  - `/scan` (Gazebo → ROS): LiDAR scan data
+  - `/clock` (Gazebo → ROS): Simulation time for `use_sim_time`
+  - `/joint_states` (Gazebo → ROS): Joint states for robot_state_publisher
+- **Wheel Parameters:** separation=0.5897m, radius=0.1m
+
+**Why Approach A:**
+- Simpler architecture without ros2_control dependencies
+- Direct use of Gazebo's physics and control systems
+- Easier to debug and maintain
+- Sufficient for simulation and SLAM demos
 
 ### Gazebo Plugins
 
-- **Diff-drive:** `gz-sim-diff-drive-system` plugin on base_link
-- **LiDAR:** `gz-sensors-lidar` plugin on lidar_link
-- Topics bridged via ros_gz_bridge nodes
+- **Diff-drive:** `gz-sim-diff-drive-system` plugin on `base_link`
+  - Consumes `/cmd_vel` for motion control
+  - Publishes `/odom` for odometry
+  - Configures TF frames: `odom` → `base_link`
+- **Joint State Publisher:** `gz-sim-joint-state-publisher-system` plugin
+  - Publishes joint states for all joints (wheels + casters)
+  - Required for `robot_state_publisher` to publish TF transforms
+- **LiDAR:** `gz-sensors-lidar` plugin on `lidar_link`
+  - Publishes `/scan` LaserScan messages
 
 ### Casters
 
 - Casters are kept as continuous joints (not fixed)
-- May cause minor instability; acceptable for demo
+- They remain passive physics-driven joints (not controlled)
+- May cause minor instability; acceptable for demo purposes
 - Can be fixed in URDF if needed for stability
+
+### Controllers Configuration
+
+The `controllers.yaml` file exists but is **NOT required** for simulation. It is kept for reference but is not loaded by any simulation launch files. The simulation relies entirely on Gazebo plugins and bridges.
 
 ## Screenshots / Evidence
 
