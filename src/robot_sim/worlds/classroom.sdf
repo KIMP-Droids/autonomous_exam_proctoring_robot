@@ -64,18 +64,13 @@
     </model>
 
     <!-- a thin floor slab so you see the room extents -->
+    <!-- Visual only to avoid collision overlap with ground_plane -->
     <model name="floor_slab">
       <static>true</static>
       <!-- Size: 14 x 10 m room, 0.05 m thick -->
       <pose>0 0 0.025 0 0 0</pose>
       <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>14 10 0.05</size>
-            </box>
-          </geometry>
-        </collision>
+        <!-- Collision removed to avoid overlap with ground_plane -->
         <visual name="visual">
           <geometry>
             <box>

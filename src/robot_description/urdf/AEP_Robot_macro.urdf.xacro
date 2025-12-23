@@ -9,13 +9,7 @@
       <inertial>
         <origin xyz="-0.0023189 0.0073427 0.1843" rpy="0 0 0" />
         <mass value="15.896" />
-        <inertia
-          ixx="0.65725"
-          ixy="-3.6456E-08"
-          ixz="0.040641"
-          iyy="0.58335"
-          iyz="-2.2784E-12"
-          izz="0.1582" />
+        <inertia ixx="0.65725" ixy="-3.6456E-08" ixz="0.040641" iyy="0.58335" iyz="-2.2784E-12" izz="0.1582" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -33,19 +27,28 @@
         </geometry>
       </collision>
     </link>
+    
+    <!-- Gazebo diff-drive plugin -->
+    <gazebo reference="${prefix}base_link">
+      <plugin name="gz::plugin::DiffDrive" filename="gz-sim-diff-drive-system">
+        <left_joint>${prefix}left_wheel_joint</left_joint>
+        <right_joint>${prefix}right_wheel_joint</right_joint>
+        <wheel_separation>0.5897</wheel_separation>
+        <wheel_radius>0.1</wheel_radius>
+        <odom_publish_rate>50</odom_publish_rate>
+        <topic>cmd_vel</topic>
+        <odom_topic>odom</odom_topic>
+        <odom_frame>odom</odom_frame>
+        <robot_base_frame>${prefix}base_link</robot_base_frame>
+      </plugin>
+    </gazebo>
 
     <!-- lidar -->
     <link name="${prefix}lidar_link">
       <inertial>
         <origin xyz="-9.1926E-05 -0.0067665 -0.0073819" rpy="0 0 0" />
         <mass value="1.3308" />
-        <inertia
-          ixx="0.0009607"
-          ixy="8.0198E-07"
-          ixz="-3.0916E-06"
-          iyy="0.00061492"
-          iyz="-0.00015824"
-          izz="0.0010982" />
+        <inertia ixx="0.0009607" ixy="8.0198E-07" ixz="-3.0916E-06" iyy="0.00061492" iyz="-0.00015824" izz="0.0010982" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -62,27 +65,151 @@
           <mesh filename="package://robot_description/meshes/lidar_link.STL" />
         </geometry>
       </collision>
+      
+      <!-- Gazebo LiDAR sensor plugin -->
+      <gazebo reference="${prefix}lidar_link">
+        <sensor name="lidar" type="ray">
+          <pose>0 0 0 0 0 0</pose>
+          <visualize>true</visualize>
+          <update_rate>10</update_rate>
+          <ray>
+            <scan>
+              <horizontal>
+                <samples>360</samples>
+                <resolution>1.0</resolution>
+                <min_angle>-3.14159</min_angle>
+                <max_angle>3.14159</max_angle>
+              </horizontal>
+            </scan>
+            <range>
+              <min>0.12</min>
+              <max>12.0</max>
+              <resolution>0.01</resolution>
+            </range>
+            <noise>
+              <type>gaussian</type>
+              <mean>0.0</mean>
+              <stddev>0.01</stddev>
+            </noise>
+          </ray>
+          <plugin name="gz::sensors::Lidar" filename="gz-sensors-lidar">
+            <topic>scan</topic>
+            <frame_id>${prefix}lidar_link</frame_id>
+          </plugin>
+        </sensor>
+      </gazebo>
     </link>
 
     <joint name="${prefix}lidar_joint" type="fixed">
       <origin xyz="0 0.000420393431200835 0.32565" rpy="0 0 0" />
       <parent link="${prefix}base_link" />
-      <child  link="${prefix}lidar_link" />
+      <child link="${prefix}lidar_link" />
       <axis xyz="0 0 0" />
     </joint>
+
+    <!-- IMU link -->
+    <link name="${prefix}imu_link">
+      <inertial>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <mass value="0.01" />
+        <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.02 0.02 0.01" />
+        </geometry>
+        <material name="">
+          <color rgba="0 1 0 0.5" />
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.02 0.02 0.01" />
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="${prefix}imu_joint" type="fixed">
+      <origin xyz="0 0 0.15" rpy="0 0 0" />
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}imu_link" />
+    </joint>
+
+    <!-- Gazebo IMU sensor plugin -->
+    <!-- NOTE: IMU plugin temporarily commented out due to plugin loading issues -->
+    <!-- The imu_link still exists in URDF for future use -->
+    <!-- To enable IMU, uncomment below and ensure correct plugin is installed -->
+    <!--
+    <gazebo reference="${prefix}imu_link">
+      <sensor name="imu_sensor" type="imu">
+        <always_on>true</always_on>
+        <update_rate>100</update_rate>
+        <imu>
+          <angular_velocity>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0002</stddev>
+                <bias_mean>0.0</bias_mean>
+                <bias_stddev>0.0</bias_stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0002</stddev>
+                <bias_mean>0.0</bias_mean>
+                <bias_stddev>0.0</bias_stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.0002</stddev>
+                <bias_mean>0.0</bias_mean>
+                <bias_stddev>0.0</bias_stddev>
+              </noise>
+            </z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.017</stddev>
+                <bias_mean>0.0</bias_mean>
+                <bias_stddev>0.0</bias_stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.017</stddev>
+                <bias_mean>0.0</bias_mean>
+                <bias_stddev>0.0</bias_stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type="gaussian">
+                <mean>0.0</mean>
+                <stddev>0.017</stddev>
+                <bias_mean>0.0</bias_mean>
+                <bias_stddev>0.0</bias_stddev>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
+      </sensor>
+    </gazebo>
+    -->
 
     <!-- left wheel -->
     <link name="${prefix}left_wheel_link">
       <inertial>
         <origin xyz="8.211E-08 -0.017522 -4.1793E-07" rpy="0 0 0" />
         <mass value="0.583" />
-        <inertia
-          ixx="0.00092026"
-          ixy="2.1255E-10"
-          ixz="8.2654E-07"
-          iyy="0.0017198"
-          iyz="-1.099E-09"
-          izz="0.00091447" />
+        <inertia ixx="0.00092026" ixy="2.1255E-10" ixz="8.2654E-07" iyy="0.0017198" iyz="-1.099E-09" izz="0.00091447" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -94,9 +221,9 @@
         </material>
       </visual>
       <collision>
-        <origin xyz="0 0 0" rpy="0 0 0" />
+        <origin xyz="0 0 0" rpy="1.5708 0 0" />
         <geometry>
-          <mesh filename="package://robot_description/meshes/left_wheel_link.STL" />
+          <cylinder radius="0.1" length="0.05" />
         </geometry>
       </collision>
     </link>
@@ -104,9 +231,8 @@
     <joint name="${prefix}left_wheel_joint" type="continuous">
       <origin xyz="0 0.29485 -0.025" rpy="0 0 0" />
       <parent link="${prefix}base_link" />
-      <child  link="${prefix}left_wheel_link" />
+      <child link="${prefix}left_wheel_link" />
       <axis xyz="0 1 0" />
-      <limit lower="0" upper="0" effort="0" velocity="0" />
     </joint>
 
     <!-- right wheel -->
@@ -114,13 +240,7 @@
       <inertial>
         <origin xyz="3.8174E-07 0.017522 1.8833E-07" rpy="0 0 0" />
         <mass value="0.583" />
-        <inertia
-          ixx="0.00091579"
-          ixy="-1.3235E-09"
-          ixz="-2.5693E-06"
-          iyy="0.0017198"
-          iyz="-7.3676E-10"
-          izz="0.00091893" />
+        <inertia ixx="0.00091579" ixy="-1.3235E-09" ixz="-2.5693E-06" iyy="0.0017198" iyz="-7.3676E-10" izz="0.00091893" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -132,9 +252,9 @@
         </material>
       </visual>
       <collision>
-        <origin xyz="0 0 0" rpy="0 0 0" />
+        <origin xyz="0 0 0" rpy="1.5708 0 0" />
         <geometry>
-          <mesh filename="package://robot_description/meshes/right_wheel_link.STL" />
+          <cylinder radius="0.1" length="0.05" />
         </geometry>
       </collision>
     </link>
@@ -142,9 +262,8 @@
     <joint name="${prefix}right_wheel_joint" type="continuous">
       <origin xyz="0 -0.29485 -0.025" rpy="0 0 0" />
       <parent link="${prefix}base_link" />
-      <child  link="${prefix}right_wheel_link" />
+      <child link="${prefix}right_wheel_link" />
       <axis xyz="0 1 0" />
-      <limit lower="0" upper="0" effort="0" velocity="0" />
     </joint>
 
     <!-- front caster -->
@@ -152,13 +271,7 @@
       <inertial>
         <origin xyz="0.0055133 0.00033058 -0.0066169" rpy="0 0 0" />
         <mass value="0.011291" />
-        <inertia
-          ixx="4.0603E-06"
-          ixy="1.367E-08"
-          ixz="8.6782E-07"
-          iyy="3.8335E-06"
-          iyz="5.2075E-08"
-          izz="4.4634E-06" />
+        <inertia ixx="4.0603E-06" ixy="1.367E-08" ixz="8.6782E-07" iyy="3.8335E-06" iyz="5.2075E-08" izz="4.4634E-06" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -180,22 +293,15 @@
     <joint name="${prefix}front_castor_body_joint" type="continuous">
       <origin xyz="0.105 0 -0.0415" rpy="0 0 0" />
       <parent link="${prefix}base_link" />
-      <child  link="${prefix}front_castor_body_link" />
+      <child link="${prefix}front_castor_body_link" />
       <axis xyz="0 0 1" />
-      <limit lower="0" upper="0" effort="0" velocity="0" />
     </joint>
 
     <link name="${prefix}front_castor_wheel_link">
       <inertial>
         <origin xyz="0.001327 -0.02196 3.518E-06" rpy="0 0 0" />
         <mass value="0.047259" />
-        <inertia
-          ixx="9.5221E-06"
-          ixy="-2.7895E-07"
-          ixz="2.5434E-09"
-          iyy="1.4162E-05"
-          iyz="1.5234E-10"
-          izz="9.4977E-06" />
+        <inertia ixx="9.5221E-06" ixy="-2.7895E-07" ixz="2.5434E-09" iyy="1.4162E-05" iyz="1.5234E-10" izz="9.4977E-06" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -217,9 +323,8 @@
     <joint name="${prefix}front_castor_wheel_joint" type="continuous">
       <origin xyz="0.021643 0.023336 -0.033" rpy="0 0 0" />
       <parent link="${prefix}front_castor_body_link" />
-      <child  link="${prefix}front_castor_wheel_link" />
+      <child link="${prefix}front_castor_wheel_link" />
       <axis xyz="0 1 0" />
-      <limit lower="0" upper="0" effort="0" velocity="0" />
     </joint>
 
     <!-- back caster -->
@@ -227,13 +332,7 @@
       <inertial>
         <origin xyz="-0.0055142 -0.00031498 -0.0066169" rpy="0 0 0" />
         <mass value="0.011291" />
-        <inertia
-          ixx="4.0603E-06"
-          ixy="1.3028E-08"
-          ixz="-8.6797E-07"
-          iyy="3.8334E-06"
-          iyz="-4.9618E-08"
-          izz="4.4634E-06" />
+        <inertia ixx="4.0603E-06" ixy="1.3028E-08" ixz="-8.6797E-07" iyy="3.8334E-06" iyz="-4.9618E-08" izz="4.4634E-06" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -255,22 +354,15 @@
     <joint name="${prefix}back_castor_body_joint" type="continuous">
       <origin xyz="-0.105 0 -0.0415" rpy="0 0 0" />
       <parent link="${prefix}base_link" />
-      <child  link="${prefix}back_castor_body_link" />
+      <child link="${prefix}back_castor_body_link" />
       <axis xyz="0 0 1" />
-      <limit lower="0" upper="0" effort="0" velocity="0" />
     </joint>
 
     <link name="${prefix}back_castor_wheel_link">
       <inertial>
         <origin xyz="0.001265 -0.021964 -2.6984E-06" rpy="0 0 0" />
         <mass value="0.047259" />
-        <inertia
-          ixx="9.5208E-06"
-          ixy="-2.6579E-07"
-          ixz="-1.9877E-09"
-          iyy="1.4164E-05"
-          iyz="-1.1341E-10"
-          izz="9.4974E-06" />
+        <inertia ixx="9.5208E-06" ixy="-2.6579E-07" ixz="-1.9877E-09" iyy="1.4164E-05" iyz="-1.1341E-10" izz="9.4974E-06" />
       </inertial>
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
@@ -292,10 +384,67 @@
     <joint name="${prefix}back_castor_wheel_joint" type="continuous">
       <origin xyz="-0.024216 0.020654 -0.033" rpy="0 0 0" />
       <parent link="${prefix}back_castor_body_link" />
-      <child  link="${prefix}back_castor_wheel_link" />
+      <child link="${prefix}back_castor_wheel_link" />
       <axis xyz="0 1 0" />
-      <limit lower="0" upper="0" effort="0" velocity="0" />
     </joint>
+
+    <!-- Gazebo ROS 2 control plugin -->
+    <gazebo>
+      <plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+        <parameters>/home/kiran_gunathilaka/development/ros/exam_bot_ws/src/robot_description/config/controllers.yaml</parameters>
+        <controller_manager_name>controller_manager</controller_manager_name>
+      </plugin>
+    </gazebo>
+
+    <!-- ros2_control hardware description -->
+    <!-- Provides joint state interfaces for all joints (wheels + casters) -->
+    <ros2_control name="GazeboSimSystem" type="system">
+      <hardware>
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      </hardware>
+      
+      <!-- Left wheel joint - state only (diff-drive plugin controls it) -->
+      <joint name="${prefix}left_wheel_joint">
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      
+      <!-- Right wheel joint - state only (diff-drive plugin controls it) -->
+      <joint name="${prefix}right_wheel_joint">
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      
+      <!-- Front caster body joint - state only (passive) -->
+      <joint name="${prefix}front_castor_body_joint">
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      
+      <!-- Front caster wheel joint - state only (passive) -->
+      <joint name="${prefix}front_castor_wheel_joint">
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      
+      <!-- Back caster body joint - state only (passive) -->
+      <joint name="${prefix}back_castor_body_joint">
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      
+      <!-- Back caster wheel joint - state only (passive) -->
+      <joint name="${prefix}back_castor_wheel_joint">
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+    </ros2_control>
 
   </xacro:macro>
 </robot>
