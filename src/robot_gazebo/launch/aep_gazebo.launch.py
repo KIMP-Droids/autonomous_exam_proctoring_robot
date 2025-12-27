@@ -55,7 +55,7 @@ def generate_launch_description():
 
     declare_use_rviz_cmd = DeclareLaunchArgument(
         'use_rviz',
-        default_value='true',
+        default_value='false',
         description='Flag to enable RViz')
 
     declare_rviz_config_file_cmd = DeclareLaunchArgument(
@@ -103,7 +103,7 @@ def generate_launch_description():
         default_value='1.57',
         description='yaw angle of initial orientation, radians')
 
-    urdf_xacro_path = os.path.join(pkg_share_description, 'urdf', 'main.urdf.xacro')
+    urdf_xacro_path = os.path.join(pkg_share_description, 'urdf', 'aep_main.urdf.xacro')
     robot_description = ParameterValue(
         Command(['xacro ', urdf_xacro_path]),
         value_type=str
