@@ -84,10 +84,12 @@
       </collision>
       <!-- Gazebo LiDAR sensor plugin -->
       <gazebo reference="${prefix}lidar_link">
-        <sensor name="lidar" type="ray">
+        <sensor name="lidar" type="lidar">
           <pose>0 0 0 0 0 0</pose>
+          <always_on>true</always_on>
           <visualize>true</visualize>
           <update_rate>10</update_rate>
+          <topic>/scan</topic>
           <ray>
             <scan>
               <horizontal>
@@ -108,10 +110,6 @@
               <stddev>0.01</stddev>
             </noise>
           </ray>
-          <plugin name="gz::sensors::Lidar" filename="gz-sensors-lidar">
-            <topic>scan</topic>
-            <frame_id>${prefix}lidar_link</frame_id>
-          </plugin>
         </sensor>
       </gazebo>
     </link>
