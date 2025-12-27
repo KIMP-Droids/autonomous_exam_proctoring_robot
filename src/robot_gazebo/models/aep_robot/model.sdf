@@ -1,5 +1,6 @@
 <sdf version='1.11'>
   <model name='AEP_Robot'>
+    <plugin filename='gz-sim8-imu-system' name='gz::sim::systems::Imu'/>
     <link name='base_footprint'>
       <inertial>
         <pose>-0.0021456169080571802 0.0062815696984499471 0.19462336323911619 0 0 0</pose>
@@ -16,10 +17,9 @@
       <collision name='base_footprint_fixed_joint_lump__base_link_collision'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://robot_description/meshes/base_link.STL</uri>
-          </mesh>
+          <box>
+            <size>0.45 0.32 0.08</size>
+          </box>
         </geometry>
       </collision>
       <collision name='base_footprint_fixed_joint_lump__imu_link_collision_1'>
@@ -109,6 +109,48 @@
         <always_on>true</always_on>
         <update_rate>50</update_rate>
         <topic>/imu/data</topic>
+        <imu>
+          <angular_velocity>
+            <x>
+              <noise type='gaussian'>
+                <mean>0.0</mean>
+                <stddev>0.0002</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type='gaussian'>
+                <mean>0.0</mean>
+                <stddev>0.0002</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type='gaussian'>
+                <mean>0.0</mean>
+                <stddev>0.0002</stddev>
+              </noise>
+            </z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x>
+              <noise type='gaussian'>
+                <mean>0.0</mean>
+                <stddev>0.0004</stddev>
+              </noise>
+            </x>
+            <y>
+              <noise type='gaussian'>
+                <mean>0.0</mean>
+                <stddev>0.0004</stddev>
+              </noise>
+            </y>
+            <z>
+              <noise type='gaussian'>
+                <mean>0.0</mean>
+                <stddev>0.0004</stddev>
+              </noise>
+            </z>
+          </linear_acceleration>
+        </imu>
       </sensor>
     </link>
     <joint name='back_castor_body_joint' type='revolute'>
@@ -144,10 +186,9 @@
       <collision name='back_castor_body_link_collision'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://robot_description/meshes/back_castor_body_link.STL</uri>
-          </mesh>
+          <box>
+            <size>0.06 0.06 0.04</size>
+          </box>
         </geometry>
       </collision>
       <visual name='back_castor_body_link_visual'>
@@ -195,13 +236,21 @@
         </inertia>
       </inertial>
       <collision name='back_castor_wheel_link_collision'>
-        <pose>0 0 0 0 0 0</pose>
+        <pose>0 0 0 1.5708 0 0</pose>
         <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://robot_description/meshes/back_castor_wheel_link.STL</uri>
-          </mesh>
+          <cylinder>
+            <length>0.02</length>
+            <radius>0.03</radius>
+          </cylinder>
         </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1.0</mu>
+              <mu2>1.0</mu2>
+            </ode>
+          </friction>
+        </surface>
       </collision>
       <visual name='back_castor_wheel_link_visual'>
         <pose>0 0 0 0 0 0</pose>
@@ -250,10 +299,9 @@
       <collision name='front_castor_body_link_collision'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://robot_description/meshes/front_castor_body_link.STL</uri>
-          </mesh>
+          <box>
+            <size>0.06 0.06 0.04</size>
+          </box>
         </geometry>
       </collision>
       <visual name='front_castor_body_link_visual'>
@@ -301,13 +349,21 @@
         </inertia>
       </inertial>
       <collision name='front_castor_wheel_link_collision'>
-        <pose>0 0 0 0 0 0</pose>
+        <pose>0 0 0 1.5708 0 0</pose>
         <geometry>
-          <mesh>
-            <scale>1 1 1</scale>
-            <uri>model://robot_description/meshes/front_castor_wheel_link.STL</uri>
-          </mesh>
+          <cylinder>
+            <length>0.02</length>
+            <radius>0.03</radius>
+          </cylinder>
         </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1.0</mu>
+              <mu2>1.0</mu2>
+            </ode>
+          </friction>
+        </surface>
       </collision>
       <visual name='front_castor_wheel_link_visual'>
         <pose>0 0 0 0 0 0</pose>
@@ -361,6 +417,14 @@
             <radius>0.10000000000000001</radius>
           </cylinder>
         </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1.2</mu>
+              <mu2>1.2</mu2>
+            </ode>
+          </friction>
+        </surface>
       </collision>
       <visual name='left_wheel_link_visual'>
         <pose>0 0 0 0 0 0</pose>
@@ -414,6 +478,14 @@
             <radius>0.10000000000000001</radius>
           </cylinder>
         </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1.2</mu>
+              <mu2>1.2</mu2>
+            </ode>
+          </friction>
+        </surface>
       </collision>
       <visual name='right_wheel_link_visual'>
         <pose>0 0 0 0 0 0</pose>
