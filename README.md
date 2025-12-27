@@ -154,6 +154,24 @@ This is where the robot becomes truly autonomous:
 - Ubuntu 22.04 or compatible Linux distribution
 - Standard ROS 2 navigation stack packages
 
+### Quick Start (Gazebo Only)
+
+```bash
+# From the workspace root
+colcon build --symlink-install
+source install/setup.bash
+
+# Launch Gazebo with the AEP robot
+ros2 launch robot_gazebo aep_gazebo.launch.py
+```
+
+Expected topics (key ones):
+- `/cmd_vel`
+- `/odom`
+- `/scan`
+- `/imu/data`
+- `/joint_states`
+
 ### Installation
 
 ```bash
@@ -193,6 +211,19 @@ ros2 launch robot_bringup slam_classroom.launch.py
 **Full Navigation Stack:**
 ```bash
 ros2 launch robot_bringup sim_classroom.launch.py
+```
+
+### Teleoperation (Keyboard)
+
+In a second terminal (after sourcing the workspace):
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
+
+Use the on-screen instructions to drive the robot (arrow keys or i/j/k/l).
+If you want to send a one-shot command:
+```bash
+ros2 topic pub /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.2}, angular: {z: 0.5}}" -1
 ```
 
 ### Quick Testing
@@ -243,4 +274,3 @@ Built with:
 **Current Status**: Foundation complete, SLAM integration in progress, waypoint navigation coming next.
 
 For questions or collaboration opportunities, reach out to the maintainer at kimpdroids@gmail.com.
-
