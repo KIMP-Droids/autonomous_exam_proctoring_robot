@@ -25,7 +25,7 @@ install(
 )
 
 install(
-  PROGRAMS scripts/odom_to_base_footprint_tf.py
+  PROGRAMS scripts/odom_to_base_footprint_tf.py scripts/cmd_vel_smoother.py scripts/teleop_toggle_smooth.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

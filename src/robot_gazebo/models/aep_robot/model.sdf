@@ -166,6 +166,7 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
+          <damping>0.2</damping>
         </dynamics>
       </axis>
     </joint>
@@ -218,6 +219,7 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
+          <damping>0.2</damping>
         </dynamics>
       </axis>
     </joint>
@@ -240,7 +242,7 @@
         <geometry>
           <cylinder>
             <length>0.02</length>
-            <radius>0.03</radius>
+            <radius>0.05</radius>
           </cylinder>
         </geometry>
         <surface>
@@ -250,6 +252,12 @@
               <mu2>1.0</mu2>
             </ode>
           </friction>
+          <contact>
+            <ode>
+              <kp>100000</kp>
+              <kd>1</kd>
+            </ode>
+          </contact>
         </surface>
       </collision>
       <visual name='back_castor_wheel_link_visual'>
@@ -279,6 +287,7 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
+          <damping>0.2</damping>
         </dynamics>
       </axis>
     </joint>
@@ -331,6 +340,7 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
+          <damping>0.2</damping>
         </dynamics>
       </axis>
     </joint>
@@ -353,7 +363,7 @@
         <geometry>
           <cylinder>
             <length>0.02</length>
-            <radius>0.03</radius>
+            <radius>0.05</radius>
           </cylinder>
         </geometry>
         <surface>
@@ -363,6 +373,12 @@
               <mu2>1.0</mu2>
             </ode>
           </friction>
+          <contact>
+            <ode>
+              <kp>100000</kp>
+              <kd>1</kd>
+            </ode>
+          </contact>
         </surface>
       </collision>
       <visual name='front_castor_wheel_link_visual'>
@@ -392,6 +408,7 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
+          <damping>0.1</damping>
         </dynamics>
       </axis>
     </joint>
@@ -424,6 +441,12 @@
               <mu2>1.2</mu2>
             </ode>
           </friction>
+          <contact>
+            <ode>
+              <kp>150000</kp>
+              <kd>2</kd>
+            </ode>
+          </contact>
         </surface>
       </collision>
       <visual name='left_wheel_link_visual'>
@@ -453,6 +476,7 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
+          <damping>0.1</damping>
         </dynamics>
       </axis>
     </joint>
@@ -485,6 +509,12 @@
               <mu2>1.2</mu2>
             </ode>
           </friction>
+          <contact>
+            <ode>
+              <kp>150000</kp>
+              <kd>2</kd>
+            </ode>
+          </contact>
         </surface>
       </collision>
       <visual name='right_wheel_link_visual'>

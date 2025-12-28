@@ -243,6 +243,25 @@ If you want to send a one-shot command:
 ros2 topic pub /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.2}, angular: {z: 0.5}}" -1
 ```
 
+### Teleoperation (Smoothed)
+
+This adds a trapezoidal velocity profile so the robot doesn't jerk on start/stop:
+```bash
+ros2 launch robot_bringup teleop_smooth.launch.py
+```
+
+In another terminal, run the keyboard teleop and remap to the smoother input:
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/cmd_vel_raw
+```
+
+### Teleoperation (Toggle + Smoothed)
+
+Press once to keep moving (no need to hold keys), with smooth accel/decel:
+```bash
+ros2 run robot_bringup teleop_toggle_smooth.py
+```
+
 ### Quick Testing
 
 Once the simulation is running:
