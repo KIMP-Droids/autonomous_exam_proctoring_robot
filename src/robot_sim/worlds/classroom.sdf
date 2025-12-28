@@ -317,31 +317,6 @@
         </visual>
       </link>
     </model>
-    <!-- Teacher chair (slightly smaller) -->
-    <model name="teacher_chair">
-      <static>true</static>
-      <pose>-0.5 3.1 0.2 0 0 0</pose>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <box>
-              <size>0.4 0.4 0.4</size>
-            </box>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <box>
-              <size>0.4 0.4 0.4</size>
-            </box>
-          </geometry>
-          <material>
-            <ambient>0.3 0.3 0.8 1</ambient>
-            <diffuse>0.3 0.3 0.9 1</diffuse>
-          </material>
-        </visual>
-      </link>
-    </model>
     <!-- Student desks & chairs (4 columns x 3 rows) -->
     <!-- Student desk size: 0.8 x 0.5 x 0.75 high -->
     <!-- Student chair size: 0.4 cube -->
