@@ -163,6 +163,42 @@ def generate_launch_description():
             '-Y', yaw
         ])
 
+    basefootprint_namespace_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='tf_aep_basefootprint_namespace',
+        arguments=[
+            '0', '0', '0',
+            '0', '0', '0',
+            'base_footprint',
+            'AEP_Robot/base_footprint'
+        ]
+    )
+
+    lidar_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='tf_aep_lidar',
+        arguments=[
+            '0', '0.000420393431200835', '0.32565',
+            '0', '0', '0',
+            'AEP_Robot/base_footprint',
+            'AEP_Robot/base_footprint/lidar'
+        ]
+    )
+
+    imu_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='tf_aep_imu',
+        arguments=[
+            '0', '0', '0.15',
+            '0', '0', '0',
+            'AEP_Robot/base_footprint',
+            'AEP_Robot/base_footprint/imu'
+        ]
+    )
+
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -193,5 +229,8 @@ def generate_launch_description():
         robot_state_publisher_node,
         bridge_node,
         spawn_robot_node,
+        basefootprint_namespace_tf,
+        lidar_tf,
+        imu_tf,
         rviz_node,
     ])

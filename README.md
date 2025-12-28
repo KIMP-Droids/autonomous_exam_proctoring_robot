@@ -208,6 +208,23 @@ This launches:
 ros2 launch robot_bringup slam_classroom.launch.py
 ```
 
+### SLAM Mapping Workflow
+
+1) Start SLAM:
+```bash
+ros2 launch robot_bringup slam_classroom.launch.py
+```
+
+2) Teleoperate in a second terminal:
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
+
+3) Save the map when done:
+```bash
+ros2 run nav2_map_server map_saver_cli -f ~/aep_maps/classroom_map
+```
+
 **Full Navigation Stack:**
 ```bash
 ros2 launch robot_bringup sim_classroom.launch.py

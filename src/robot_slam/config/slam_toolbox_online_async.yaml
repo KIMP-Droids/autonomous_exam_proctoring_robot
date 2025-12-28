@@ -3,7 +3,7 @@ slam_toolbox:
     # Basic Parameters
     odom_frame: odom
     map_frame: map
-    base_frame: base_link
+    base_frame: AEP_Robot/base_footprint
     scan_topic: /scan
     mode: mapping  # localization or mapping
     max_laser_range: 20.0
@@ -44,4 +44,3 @@ slam_toolbox:
     minimum_angle_penalty: 0.9
     minimum_distance_penalty: 0.5
     use_response_expansion: true
-
