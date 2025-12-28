@@ -3,7 +3,7 @@
     <plugin filename='gz-sim8-imu-system' name='gz::sim::systems::Imu'/>
     <link name='base_footprint'>
       <inertial>
-        <pose>-0.0021456169080571802 0.0062815696984499471 0.19462336323911619 0 0 0</pose>
+        <pose>-0.0021456169080571802 0.0062815696984499471 0.07 0 0 0</pose>
         <mass>17.236799999999999</mass>
         <inertia>
           <ixx>0.68051047690503075</ixx>
@@ -520,6 +520,8 @@
       <odom_topic>/odom</odom_topic>
       <frame_id>odom</frame_id>
       <child_frame_id>base_footprint</child_frame_id>
+      <max_linear_acceleration>0.5</max_linear_acceleration>
+      <max_angular_acceleration>1.0</max_angular_acceleration>
     </plugin>
     <frame name='imu_joint' attached_to='base_link'>
       <pose>0 0 0.14999999999999999 0 0 0</pose>
