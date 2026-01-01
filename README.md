@@ -154,6 +154,24 @@ This is where the robot becomes truly autonomous:
 - Ubuntu 22.04 or compatible Linux distribution
 - Standard ROS 2 navigation stack packages
 
+### Quick Start (Gazebo Only)
+
+```bash
+# From the workspace root
+colcon build --symlink-install
+source install/setup.bash
+
+# Launch Gazebo with the AEP robot
+ros2 launch robot_gazebo aep_gazebo.launch.py
+```
+
+Expected topics (key ones):
+- `/cmd_vel`
+- `/odom`
+- `/scan`
+- `/imu/data`
+- `/joint_states`
+
 ### Installation
 
 ```bash
@@ -190,9 +208,58 @@ This launches:
 ros2 launch robot_bringup slam_classroom.launch.py
 ```
 
+### SLAM Mapping Workflow
+
+1) Start SLAM:
+```bash
+ros2 launch robot_bringup slam_classroom.launch.py
+```
+
+2) Teleoperate in a second terminal:
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
+
+3) Save the map when done:
+```bash
+ros2 run nav2_map_server map_saver_cli -f ~/aep_maps/classroom_map
+```
+
 **Full Navigation Stack:**
 ```bash
 ros2 launch robot_bringup sim_classroom.launch.py
+```
+
+### Teleoperation (Keyboard)
+
+In a second terminal (after sourcing the workspace):
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
+
+Use the on-screen instructions to drive the robot (arrow keys or i/j/k/l).
+If you want to send a one-shot command:
+```bash
+ros2 topic pub /cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.2}, angular: {z: 0.5}}" -1
+```
+
+### Teleoperation (Smoothed)
+
+This adds a trapezoidal velocity profile so the robot doesn't jerk on start/stop:
+```bash
+ros2 launch robot_bringup teleop_smooth.launch.py
+```
+
+In another terminal, run the keyboard teleop and remap to the smoother input:
+```bash
+ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/cmd_vel_raw
+```
+
+### Teleoperation (Toggle + Smoothed)
+
+Press once to keep moving (no need to hold keys), with smooth accel/decel:
+```bash
+ros2 run robot_bringup teleop_toggle_smooth.py
 ```
 
 ### Quick Testing
@@ -243,4 +310,3 @@ Built with:
 **Current Status**: Foundation complete, SLAM integration in progress, waypoint navigation coming next.
 
 For questions or collaboration opportunities, reach out to the maintainer at kimpdroids@gmail.com.
-

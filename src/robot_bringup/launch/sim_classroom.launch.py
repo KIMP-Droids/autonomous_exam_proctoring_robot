@@ -53,6 +53,23 @@ def generate_launch_description():
         }.items()
     )
 
+    urdf_xacro_path = os.path.join(desc_share, 'urdf', 'aep_main.urdf.xacro')
+    robot_description = ParameterValue(
+        Command(['xacro ', urdf_xacro_path]),
+        value_type=str
+    )
+
+    robot_state_publisher_node = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='screen',
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'robot_description': robot_description,
+        }]
+    )
+
     joint_state_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -141,12 +158,57 @@ def generate_launch_description():
         parameters=[{'use_sim_time': use_sim_time}],
         output='screen'
     )
+
+    odom_to_base_footprint_tf_node = Node(
+        package='robot_bringup',
+        executable='odom_to_base_footprint_tf.py',
+        name='odom_to_base_footprint_tf',
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time}],
+    )
+
+    basefootprint_namespace_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='tf_aep_basefootprint_namespace',
+        arguments=[
+            '0', '0', '0',
+            '0', '0', '0',
+            'base_footprint',
+            'AEP_Robot/base_footprint'
+        ]
+    )
+
+    lidar_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='tf_aep_lidar',
+        arguments=[
+            '0', '0.000420393431200835', '0.32565',
+            '0', '0', '0',
+            'AEP_Robot/base_footprint',
+            'AEP_Robot/base_footprint/lidar'
+        ]
+    )
+
+    imu_tf = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='tf_aep_imu',
+        arguments=[
+            '0', '0', '0.15',
+            '0', '0', '0',
+            'AEP_Robot/base_footprint',
+            'AEP_Robot/base_footprint/imu'
+        ]
+    )
     
 
     return LaunchDescription([
         use_sim_time_arg,
         rviz_arg,
         sim_world_launch,
+        robot_state_publisher_node,
         clock_bridge,  
         tf_bridge,
         cmd_vel_bridge,
@@ -154,5 +216,8 @@ def generate_launch_description():
         scan_bridge,
         joint_state_bridge,
         rviz_node,
+        basefootprint_namespace_tf,
+        lidar_tf,
+        imu_tf,
+        odom_to_base_footprint_tf_node,
     ])
-
